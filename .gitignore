@@ -1,0 +1,50 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Resultados de tests
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+
+## Angular / pnpm (web/)
+web/node_modules/
+web/dist/
+web/.angular/
+*.log
+pnpm-debug.log*
+npm-debug.log*
+
+## Flutter / Dart (mobile/)
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/build/
+mobile/.pub-cache/
+
+## IDEs
+.idea/
+*.iml
+
+## Entorno local / secretos
+.env
+.env.*
+!.env.example
+
+## Sistema operativo
+Thumbs.db
+.DS_Store
+
+## Asistentes de IA e instrucciones de proyecto (no se publican en el repo)
+CLAUDE.md
+.claude/
+.cursor/
+.cursorrules
+.windsurf/
+.windsurfrules
+.github/copilot-instructions.md
+.aider*
