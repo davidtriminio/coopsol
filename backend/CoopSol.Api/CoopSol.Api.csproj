@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoopSol.Application\CoopSol.Application.csproj" />
+    <ProjectReference Include="..\CoopSol.Infrastructure\CoopSol.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>1e4b52e8-7bfa-4d9e-8700-a650fd689a8e</UserSecretsId>
+  </PropertyGroup>
+
+</Project>
