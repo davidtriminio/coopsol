@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/backend/">
+    <Project Path="backend/CoopSol.Api/CoopSol.Api.csproj" />
+    <Project Path="backend/CoopSol.Application/CoopSol.Application.csproj" />
+    <Project Path="backend/CoopSol.Domain/CoopSol.Domain.csproj" />
+    <Project Path="backend/CoopSol.Infrastructure/CoopSol.Infrastructure.csproj" />
+    <Project Path="backend/CoopSol.Tests/CoopSol.Tests.csproj" />
+  </Folder>
+</Solution>
