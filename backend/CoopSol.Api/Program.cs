@@ -1,3 +1,4 @@
+using CoopSol.Infrastructure;
 using CoopSol.Infrastructure.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -9,6 +10,8 @@ var connectionString = builder.Configuration.GetConnectionString("Default")
                            "Falta la connection string 'Default'. Configúrala con " +
                            "'dotnet user-secrets set \"ConnectionStrings:Default\" \"...\"' en desarrollo, " +
                            "o con la variable de entorno ConnectionStrings__Default en producción.");
+
+builder.Services.AddInfrastructure(connectionString);
 
 builder.Services.AddHealthChecks()
     .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live" })
