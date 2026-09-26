@@ -94,6 +94,14 @@ public sealed class AuthService(
         return Result.Success();
     }
 
+    public async Task<Result<UserDto>> GetProfileAsync(Guid userId, CancellationToken ct = default)
+    {
+        var user = await users.GetByIdAsync(userId, ct);
+        return user is null || !user.IsActive
+            ? Result<UserDto>.Failure(AuthErrors.UserNotFound)
+            : Result<UserDto>.Success(ToDto(user));
+    }
+
     private async Task<Result<UserDto>> CreateUserInternalAsync(
         string email, string password, string fullName, UserRole role, CancellationToken ct)
     {
