@@ -31,7 +31,7 @@ public class Result<T> : Result
     private Result(T value): base(null) =>_value = value;
     private Result(Error error): base(error) { }
 
-    public T? Value => _value ?? throw new InvalidOperationException("El resultado es un fallo; no tiene valor.");
+    public T Value => _value ?? throw new InvalidOperationException("El resultado es un fallo; no tiene valor.");
 
     public static Result<T> Success(T value) => new(value);
     public new static Result<T> Failure(Error error) => new(error);
