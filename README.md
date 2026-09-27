@@ -4,7 +4,7 @@ Plataforma de gestión interna para una cooperativa de ahorro y crédito hondure
 No es banca real, no mueve dinero real, no da asesoría financiera. Proyecto de aprendizaje intensivo.
 
 ## Stack
-- Backend: .NET 10 (SDK 10.0.401), ASP.NET Core minimal APIs, EF Core 10 (desde F2/F3), PostgreSQL 17.
+- Backend: .NET 10 (SDK 10.0.401), ASP.NET Core minimal APIs, EF Core 10 (desde F1), PostgreSQL 17.
 - Web: Angular 20+ (standalone, signals, zoneless).
 - Mobile: Flutter/Dart.
 - Infra: Docker Compose.
@@ -30,6 +30,13 @@ Clean Architecture "lite" por capas: `Domain` → `Application` → `Infrastruct
    dotnet user-secrets set "ConnectionStrings:Default" "Host=localhost;Port=5432;Database=coopsol_dev;Username=coopsol;Password=<tu-password>" --project backend/CoopSol.Api
    ```
 
+   Secretos de la fase de Auth (una sola vez):
+   ```pwsh
+   $secret = [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(64))
+   dotnet user-secrets set "Jwt:Secret" $secret --project backend/CoopSol.Api
+   dotnet user-secrets set "Seed:AdminEmail" "admin@coopsol.local" --project backend/CoopSol.Api
+   dotnet user-secrets set "Seed:AdminPassword" "<elige-una-clave-de-12+-caracteres>" --project backend/CoopSol.Api
+
 4. Corre la API:
 ```pwsh
 dotnet run --project backend/CoopSol.Api 
@@ -38,11 +45,26 @@ dotnet run --project backend/CoopSol.Api
 5. Verifica:
 - `GET /health/live` → proceso vivo.
 - `GET /health/ready` → proceso vivo y BD alcanzable.
+
+
+3. Antes de "Tests", agrega la sección de endpoints y ajusta la nota de tests:
+```markdown
+## Endpoints de autenticación
+| Método | Ruta | Acceso |
+|---|---|---|
+| POST | /api/auth/register | Público (crea Socio) |
+| POST | /api/auth/login | Público |
+| POST | /api/auth/refresh | Público |
+| POST | /api/auth/logout | Público |
+| GET | /api/auth/me | JWT |
+| POST | /api/admin/users | JWT + rol Admin |
+
 ## Tests
 
 ```pwsh
 dotnet test CoopSol.slnx
 ```
+Los tests de integración usan Testcontainers y requieren Docker Desktop encendido.
 
 ## Documentación por fase
 Ver [`docs/fases/`](docs/fases/) para el reporte de cada fase (qué se construyó, decisiones, validación).
