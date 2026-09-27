@@ -18,6 +18,8 @@ public static class ResultExtensions
             type: error.Code),
         ErrorType.Unauthorized => Results.Problem(
             statusCode: StatusCodes.Status401Unauthorized, title: error.Message, type: error.Code),
+        ErrorType.Conflict => Results.Problem(
+            statusCode: StatusCodes.Status409Conflict, title: error.Message, type: error.Code),
         ErrorType.NotFound => Results.Problem(
             statusCode: StatusCodes.Status404NotFound, title: error.Message, type: error.Code),
         _ => Results.Problem(statusCode: StatusCodes.Status500InternalServerError)
