@@ -7,6 +7,7 @@ using CoopSol.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using CorsServiceCollectionExtensions = CoopSol.Api.Extensions.CorsServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,7 @@ builder.Services.AddJwtSettings(builder.Configuration);
 builder.Services.AddJwtAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthRateLimiting(builder.Configuration);
+builder.Services.AddWebCors(builder.Configuration);
 builder.Services.AddProblemDetails();
 
 builder.Services.AddHealthChecks()
@@ -49,6 +51,7 @@ if (!string.IsNullOrWhiteSpace(seedEmail) && !string.IsNullOrWhiteSpace(seedPass
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();
+app.UseCors(CorsServiceCollectionExtensions.WebCorsPolicy);
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
