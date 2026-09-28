@@ -18,6 +18,10 @@ export class TokenStore {
     this.userSignal.set(response.user)
   }
 
+  updateUser(user: AuthUser): void{
+    this.userSignal.set(user)
+  }
+
   clear(): void {
     this.accessTokenSignal.set(null)
     this.refreshTokenSignal.set(null)
