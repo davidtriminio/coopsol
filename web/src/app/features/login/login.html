@@ -8,13 +8,6 @@
     </div>
     <!-- /.brand -->
 
-    @if (loggedInUser(); as user){
-      <div class="success">
-        <h1>Sesión iniciada</h1>
-        <p>{{user}}</p>
-        <p class="hint">---</p>
-      </div>
-    } @else {
       <form [formGroup]="form" (ngSubmit)="submit()">
         <h1>Bienvenido</h1>
         <p class="sub">Inicia sesión con tu cuenta de staff</p>
@@ -34,7 +27,7 @@
         </label>
 
         @if (form.controls.password.touched && form.controls.password.invalid){
-          <p class="field-error">Ingresa una contraseña válida</p>
+          <p class="field-error">La contraseña es obligatoria</p>
         }
 
         @if (errorMessage(); as message){
@@ -46,7 +39,6 @@
         </button>
 
       </form>
-    }
 
   </div>
   <!-- /.card -->

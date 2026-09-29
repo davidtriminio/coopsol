@@ -149,13 +149,3 @@ button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
-
-.success h1 {
-  margin-bottom: 8px;
-}
-
-.success .hint {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 12px;
-}
