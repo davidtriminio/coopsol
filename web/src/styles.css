@@ -11,10 +11,33 @@ body {
 :root {
   --font-display: 'Sora', system-ui, sans-serif;
   --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --surface: #f6f4ef;
+  --surface-elevated: #ffffff;
+  --text: #1c1b18;
+  --text-muted: #6c685f;
+  --border: rgba(28, 27, 24, 0.08);
+  --accent: #3c6e58;
+  --accent-fg: #eef6f1;
+  --danger: #a32d2d;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root{
+    --surface: #15140f;
+    --surface-elevated: #201f1c;
+    --text: #f1efe7;
+    --text-muted: #a49f92;
+    --border: rgba(241, 239, 231, 0.1);
+    --accent: #7fb69c;
+    --accent-fg: #0e1a15;
+    --danger: #ff9b9b;
+  }
 }
 
 body {
   font-family: var(--font-body);
+  background: var(--surface);
+  color: var(--text);
 }
 
 @font-face {
