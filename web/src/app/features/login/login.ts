@@ -20,7 +20,7 @@ export class Login {
   private readonly router = inject(Router)
 
   readonly form = this.fb.nonNullable.group({
-    email: ['', Validators.required, Validators.email],
+    email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required]
   })
 
