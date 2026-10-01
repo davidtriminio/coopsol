@@ -1,0 +1,30 @@
+﻿<section class="profile" [animate.enter]="'profile-in'">
+  <h1>Mi perfil</h1>
+
+  @if (currentUser(); as user) {
+    <dl class="info">
+      <dt>Nombre</dt>
+      <dd>{{user.fullName}}</dd>
+
+      <dt>Correo</dt>
+      <dd>{{user.email}}</dd>
+
+      <dt>Rol</dt>
+      <dd>{{roleLabels[user.role]}}</dd>
+    </dl>
+    <!-- /.info -->
+  }
+
+  <p class="error" [class.is-visible]="!!errorMessage()">{{errorMessage()}}</p>
+  <!-- /.error -->
+
+  <div class="actions">
+    <button type="button" class="logout" (click)="logout()" [disabled]="loggingOut()">
+      @if (loggingOut()) { <span class="spinner" aria-hidden="true"></span>}
+      <span>{{loggingOut() ? 'Saliendo...' : 'Cerrar sesión'}}</span>
+    </button>
+  </div>
+  <!-- /.actions -->
+
+</section>
+<!-- /.profile -->

@@ -6,10 +6,16 @@
     </div>
     <!-- /.brand -->
 
-    @if (currentUser(); as user){
+    @if (currentUser(); as user) {
       <div class="user">
-        <span class="user-name">{{user.fullName}}</span>
-        <span class="user-role">{{user.role}}</span>
+        <a class="user-link" routerLink="/profile">
+          <span class="user-name">{{ user.fullName }}</span>
+          <span class="user-role">{{ user.role }}</span>
+        </a>
+
+        <button type="button" class="logout" (click)="logout()" [disabled]="loggingOut()">
+          {{loggingOut() ? 'Saliendo...' : 'Salir'}}
+        </button>
       </div>
       <!-- /.user -->
     }
@@ -18,7 +24,7 @@
   <!-- /.topbar -->
 
   <main class="content">
-    <router-outlet/>
+    <router-outlet />
   </main>
 
 </div>

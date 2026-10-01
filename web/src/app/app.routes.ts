@@ -10,7 +10,12 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./layout/staff-shell').then((m) => m.StaffShell),
     canActivate: [authGuard],
-    children: []
+    children: [
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/profile/profile').then((m) => m.Profile)
+      }
+    ]
   },
   {
     path: '**',
