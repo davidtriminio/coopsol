@@ -50,9 +50,23 @@
 
 .user {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
   font-size: 13px;
+}
+
+.nav-link {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.nav-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .user-link {
@@ -72,7 +86,7 @@
 }
 
 .user-role {
-  color: #6c685f;
+  color: var(--text-muted);
   text-transform: uppercase;
   font-size: 11px;
   letter-spacing: 0.04em;

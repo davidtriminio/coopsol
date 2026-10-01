@@ -1,0 +1,135 @@
+:host {
+  display: block;
+}
+
+.create-user {
+  max-width: 460px;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 20px;
+}
+
+.field {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.field span {
+  display: block;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.field-error {
+  font-size: 12px;
+  color: var(--danger);
+  margin: -8px 0 12px;
+  min-height: 16px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.field-error.is-visible {
+  opacity: 1;
+}
+
+.form-error,
+.form-success {
+  font-size: 13px;
+  margin: 0 0 14px;
+  min-height: 18px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.form-error {
+  color: var(--danger);
+}
+
+.form-success {
+  color: var(--accent);
+}
+
+.form-error.is-visible,
+.form-success.is-visible {
+  opacity: 1;
+}
+
+button {
+  border: none;
+  border-radius: 999px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  background: var(--accent);
+  color: var(--accent-fg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 160px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.create-user-in {
+  animation: create-user-in 0.3s ease-out;
+}
+
+@keyframes create-user-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  button {
+    width: 100%;
+  }
+}

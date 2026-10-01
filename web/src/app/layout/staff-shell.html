@@ -8,13 +8,18 @@
 
     @if (currentUser(); as user) {
       <div class="user">
+
+        @if (user.role === 'Admin') {
+          <a class="nav-link" routerLink="/admin/users/new">Crear usuario</a>
+        }
+
         <a class="user-link" routerLink="/profile">
           <span class="user-name">{{ user.fullName }}</span>
           <span class="user-role">{{ user.role }}</span>
         </a>
 
         <button type="button" class="logout" (click)="logout()" [disabled]="loggingOut()">
-          {{loggingOut() ? 'Saliendo...' : 'Salir'}}
+          {{ loggingOut() ? 'Saliendo...' : 'Salir' }}
         </button>
       </div>
       <!-- /.user -->
