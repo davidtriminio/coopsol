@@ -39,7 +39,9 @@ class AuthService {
     if (refreshToken != null) {
       try {
         await _authApi.logout(refreshToken);
-      } on DioException {}
+      } on DioException {
+        return;
+      }
     }
     await _tokenStore.clear();
   }
