@@ -36,13 +36,14 @@ class AuthService {
 
   Future<void> logout() async {
     final refreshToken = await _tokenStore.readRefreshToken();
-    if (refreshToken != null) {
-      try {
+    try {
+      if (refreshToken != null) {
         await _authApi.logout(refreshToken);
-      } on DioException {
-        return;
       }
+    } on DioException {
+      return;
+    } finally {
+      await _tokenStore.clear();
     }
-    await _tokenStore.clear();
   }
 }
