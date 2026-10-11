@@ -22,6 +22,46 @@ AuthResponse buildResponse({
   );
 }
 
+class FailingStorage extends FlutterSecureStorage {
+  FailingStorage({this.failOnWrite = false, this.failOnDelete = false});
+
+  final bool failOnWrite;
+  final bool failOnDelete;
+
+  @override
+  Future<void> write({
+    required String key,
+    required String? value,
+    AppleOptions? iOptions,
+    AndroidOptions? aOptions,
+    LinuxOptions? lOptions,
+    WebOptions? webOptions,
+    AppleOptions? mOptions,
+    WindowsOptions? wOptions,
+  }) {
+    if (failOnWrite) {
+      throw StateError('storage unavailable');
+    }
+    return super.write(key: key, value: value);
+  }
+
+  @override
+  Future<void> delete({
+    required String key,
+    AppleOptions? iOptions,
+    AndroidOptions? aOptions,
+    LinuxOptions? lOptions,
+    WebOptions? webOptions,
+    AppleOptions? mOptions,
+    WindowsOptions? wOptions,
+  }) {
+    if (failOnDelete) {
+      throw StateError('storage unavailable');
+    }
+    return super.delete(key: key);
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -38,17 +78,19 @@ void main() {
     expect(await store.readRefreshToken(), isNull);
   });
 
-  test('setSession keeps the session in memory and persists the refresh token',
-          () async {
-        final store = TokenStore();
+  test(
+    'setSession keeps the session in memory and persists the refresh token',
+    () async {
+      final store = TokenStore();
 
-        await store.setSession(buildResponse());
+      await store.setSession(buildResponse());
 
-        expect(store.isAuthenticated, isTrue);
-        expect(store.accessToken, 'access-1');
-        expect(store.currentUser?.email, 'socio@example.com');
-        expect(await store.readRefreshToken(), 'refresh-1');
-      });
+      expect(store.isAuthenticated, isTrue);
+      expect(store.accessToken, 'access-1');
+      expect(store.currentUser?.email, 'socio@example.com');
+      expect(await store.readRefreshToken(), 'refresh-1');
+    },
+  );
 
   test('a new store instance recovers only the refresh token', () async {
     await TokenStore().setSession(buildResponse());
@@ -113,5 +155,68 @@ void main() {
 
       expect(store.hasRole([UserRole.gerente, UserRole.admin]), isFalse);
     });
+  });
+
+  group('notifications', () {
+    test('setSession notifies once with the session already set', () async {
+      final store = TokenStore();
+      final seen = <String?>[];
+      store.addListener(() => seen.add(store.accessToken));
+
+      await store.setSession(buildResponse());
+
+      expect(seen, ['access-1']);
+    });
+
+    test('updateUser notifies once with the new user', () async {
+      final store = TokenStore();
+      await store.setSession(buildResponse());
+      final seen = <UserRole?>[];
+      store.addListener(() => seen.add(store.currentUser?.role));
+
+      store.updateUser(buildResponse(role: UserRole.gerente).user);
+
+      expect(seen, [UserRole.gerente]);
+    });
+
+    test('clear notifies once with the session already empty', () async {
+      final store = TokenStore();
+      await store.setSession(buildResponse());
+      final seen = <bool>[];
+      store.addListener(() => seen.add(store.isAuthenticated));
+
+      await store.clear();
+
+      expect(seen, [false]);
+    });
+
+    test('setSession leaves no partial session when storage fails', () async {
+      final store = TokenStore(storage: FailingStorage(failOnWrite: true));
+      var notifications = 0;
+      store.addListener(() => notifications++);
+
+      await expectLater(
+        store.setSession(buildResponse()),
+        throwsStateError,
+      );
+
+      expect(store.isAuthenticated, isFalse);
+      expect(store.currentUser, isNull);
+      expect(notifications, 0);
+    });
+
+    test('clear empties memory and notifies even when storage fails',
+            () async {
+          final store = TokenStore(storage: FailingStorage(failOnDelete: true));
+          await store.setSession(buildResponse());
+          var notifications = 0;
+          store.addListener(() => notifications++);
+
+          await expectLater(store.clear(), throwsStateError);
+
+          expect(store.isAuthenticated, isFalse);
+          expect(store.currentUser, isNull);
+          expect(notifications, 1);
+        });
   });
 }
