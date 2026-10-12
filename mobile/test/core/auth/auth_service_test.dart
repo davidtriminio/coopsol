@@ -1,4 +1,5 @@
 import 'package:coopsol_mobile/core/auth/auth_api_service.dart';
+import 'package:coopsol_mobile/core/auth/auth_exceptions.dart';
 import 'package:coopsol_mobile/core/auth/auth_models.dart';
 import 'package:coopsol_mobile/core/auth/auth_service.dart';
 import 'package:coopsol_mobile/core/auth/refresh_coordinator.dart';
@@ -30,6 +31,12 @@ void main() {
 
   ResponseBody unauthorized() {
     return jsonResponse({'title': 'Unauthorized'}, status: 401);
+  }
+
+  ResponseBody loginAs(String role) {
+    final body = authBody();
+    (body['user'] as Map<String, dynamic>)['role'] = role;
+    return jsonResponse(body);
   }
 
   setUp(() {
@@ -68,24 +75,82 @@ void main() {
       expect(store.isAuthenticated, isFalse);
       expect(await store.readRefreshToken(), isNull);
     });
+
+    for (final role in ['Cajero', 'OficialCredito', 'Gerente', 'Admin']) {
+      test('rejects the $role role without storing a session', () async {
+        build((options) {
+          if (options.uri.path == loginPath) {
+            return loginAs(role);
+          }
+          return ResponseBody.fromString('', 204);
+        });
+        var notifications = 0;
+        store.addListener(() => notifications++);
+
+        await expectLater(
+          service.login(email: 'staff@example.com', password: 'secret'),
+          throwsA(isA<RoleNotAllowedException>()),
+        );
+
+        expect(store.isAuthenticated, isFalse);
+        expect(await store.readRefreshToken(), isNull);
+        expect(notifications, 0);
+      });
+    }
+
+    test('revokes the refresh token issued to a rejected role', () async {
+      build((options) {
+        if (options.uri.path == loginPath) {
+          return loginAs('Cajero');
+        }
+        return ResponseBody.fromString('', 204);
+      });
+
+      await expectLater(
+        service.login(email: 'staff@example.com', password: 'secret'),
+        throwsA(isA<RoleNotAllowedException>()),
+      );
+
+      final logout = adapter.requests.last;
+      expect(logout.uri.path, logoutPath);
+      expect(logout.data, {'refreshToken': 'refresh-1'});
+    });
+
+    test('still rejects the role when the revocation fails', () async {
+      build((options) {
+        if (options.uri.path == loginPath) {
+          return loginAs('Admin');
+        }
+        return jsonResponse({'title': 'Error'}, status: 500);
+      });
+
+      await expectLater(
+        service.login(email: 'staff@example.com', password: 'secret'),
+        throwsA(isA<RoleNotAllowedException>()),
+      );
+
+      expect(store.isAuthenticated, isFalse);
+    });
   });
 
   group('restoreSession', () {
-    test('returns false without calling the server when there is no token',
-            () async {
-          build((options) => jsonResponse(authBody()));
+    test(
+      'returns false without calling the server when there is no token',
+      () async {
+        build((options) => jsonResponse(authBody()));
 
-          final restored = await service.restoreSession();
+        final restored = await service.restoreSession();
 
-          expect(restored, isFalse);
-          expect(adapter.requests, isEmpty);
-        });
+        expect(restored, isFalse);
+        expect(adapter.requests, isEmpty);
+      },
+    );
 
     test('refreshes with the stored token and starts a session', () async {
       FlutterSecureStorage.setMockInitialValues({'refresh_token': 'refresh-1'});
       store = TokenStore();
       build(
-            (options) => jsonResponse(
+        (options) => jsonResponse(
           authBody(accessToken: 'access-2', refreshToken: 'refresh-2'),
         ),
       );
@@ -99,35 +164,41 @@ void main() {
       expect(await store.readRefreshToken(), 'refresh-2');
     });
 
-    test('returns false and clears the session when the token is rejected',
-            () async {
-          FlutterSecureStorage.setMockInitialValues({'refresh_token': 'stale'});
-          store = TokenStore();
-          build((options) => unauthorized());
+    test(
+      'returns false and clears the session when the token is rejected',
+      () async {
+        FlutterSecureStorage.setMockInitialValues({'refresh_token': 'stale'});
+        store = TokenStore();
+        build((options) => unauthorized());
 
-          final restored = await service.restoreSession();
+        final restored = await service.restoreSession();
 
-          expect(restored, isFalse);
-          expect(store.isAuthenticated, isFalse);
-          expect(await store.readRefreshToken(), isNull);
+        expect(restored, isFalse);
+        expect(store.isAuthenticated, isFalse);
+        expect(await store.readRefreshToken(), isNull);
+      },
+    );
+
+    test(
+      'returns false but keeps the token when the server is unreachable',
+      () async {
+        FlutterSecureStorage.setMockInitialValues({
+          'refresh_token': 'refresh-1',
+        });
+        store = TokenStore();
+        build((options) {
+          throw DioException.connectionError(
+            requestOptions: options,
+            reason: 'offline',
+          );
         });
 
-    test('returns false but keeps the token when the server is unreachable',
-            () async {
-          FlutterSecureStorage.setMockInitialValues({'refresh_token': 'refresh-1'});
-          store = TokenStore();
-          build((options) {
-            throw DioException.connectionError(
-              requestOptions: options,
-              reason: 'offline',
-            );
-          });
+        final restored = await service.restoreSession();
 
-          final restored = await service.restoreSession();
-
-          expect(restored, isFalse);
-          expect(await store.readRefreshToken(), 'refresh-1');
-        });
+        expect(restored, isFalse);
+        expect(await store.readRefreshToken(), 'refresh-1');
+      },
+    );
   });
 
   group('logout', () {
@@ -153,14 +224,16 @@ void main() {
       expect(await store.readRefreshToken(), isNull);
     });
 
-    test('clears the session without a request when there is no token',
-            () async {
-          build((options) => ResponseBody.fromString('', 204));
+    test(
+      'clears the session without a request when there is no token',
+      () async {
+        build((options) => ResponseBody.fromString('', 204));
 
-          await service.logout();
+        await service.logout();
 
-          expect(adapter.requests, isEmpty);
-          expect(store.isAuthenticated, isFalse);
-        });
+        expect(adapter.requests, isEmpty);
+        expect(store.isAuthenticated, isFalse);
+      },
+    );
   });
 }
