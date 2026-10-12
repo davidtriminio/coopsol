@@ -1,8 +1,12 @@
+import 'package:coopsol_mobile/core/auth/auth_exceptions.dart';
 import 'package:coopsol_mobile/core/auth/auth_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 String describeLoginError(Object error) {
+  if(error is RoleNotAllowedException){
+    return 'Esta aplicación es solo para socios. El personal debe usar el sistema web.';
+  }
   if (error is DioException) {
     final status = error.response?.statusCode;
     if (status == 401) {
