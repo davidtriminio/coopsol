@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 String describeLoginError(Object error) {
-  if(error is RoleNotAllowedException){
+  if (error is RoleNotAllowedException) {
     return 'Esta aplicación es solo para socios. El personal debe usar el sistema web.';
   }
   if (error is DioException) {

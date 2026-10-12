@@ -47,7 +47,7 @@ class AuthService {
     final refreshToken = await _tokenStore.readRefreshToken();
     try {
       if (refreshToken != null) {
-        await _authApi.logout(refreshToken);
+        await _revokeQuietly(refreshToken);
       }
     }finally {
       await _tokenStore.clear();
