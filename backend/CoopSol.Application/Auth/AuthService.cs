@@ -115,7 +115,14 @@ public sealed class AuthService(
 
         var user = User.Create(normalizedEmail, hasher.Hash(password), fullName, role, clock.GetUtcNow().UtcDateTime);
         users.Add(user);
-        await unitOfWork.SaveChangesAsync(ct);
+        try
+        {
+            await unitOfWork.SaveChangesAsync(ct);
+        }
+        catch (UniqueConstraintViolationException)
+        {
+            return Result<UserDto>.Failure(AuthErrors.EmailTaken);
+        }
 
         return Result<UserDto>.Success(ToDto(user));
     }
