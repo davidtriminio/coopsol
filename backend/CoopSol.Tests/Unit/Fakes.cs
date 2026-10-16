@@ -24,6 +24,7 @@ internal sealed class InMemoryStore : IUserRepository, IRefreshTokenRepository, 
 {
     public List<User> Users { get; } = [];
     public List<RefreshToken> Tokens { get; } = [];
+    public Exception? ThrowOnSave { get; set; }
 
     public Task<User?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
     Task.FromResult(Users.FirstOrDefault(u => u.Id == id));
@@ -45,5 +46,5 @@ internal sealed class InMemoryStore : IUserRepository, IRefreshTokenRepository, 
     public void Add(RefreshToken token) => Tokens.Add(token);
 
     public Task<int> SaveChangesAsync(CancellationToken ct = default) =>
-    Task.FromResult(0);
+    ThrowOnSave is null ? Task.FromResult(0) : Task.FromException<int>(ThrowOnSave);
 }
