@@ -1,0 +1,7 @@
+<Solution>
+    <Project Path="CoopSol.Api/CoopSol.Api.csproj" />
+    <Project Path="CoopSol.Application/CoopSol.Application.csproj" />
+    <Project Path="CoopSol.Domain/CoopSol.Domain.csproj" />
+    <Project Path="CoopSol.Infrastructure/CoopSol.Infrastructure.csproj" />
+    <Project Path="CoopSol.Tests/CoopSol.Tests.csproj" />
+</Solution>
