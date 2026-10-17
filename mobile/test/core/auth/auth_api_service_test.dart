@@ -1,42 +1,8 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:coopsol_mobile/core/auth/auth_api_service.dart';
 import 'package:coopsol_mobile/core/auth/auth_models.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-typedef FakeHandler = ResponseBody Function(RequestOptions options);
-
-class FakeAdapter implements HttpClientAdapter {
-  FakeAdapter(this.handler);
-
-  final FakeHandler handler;
-  final List<RequestOptions> requests = [];
-
-  @override
-  Future<ResponseBody> fetch(
-      RequestOptions options,
-      Stream<Uint8List>? requestStream,
-      Future<void>? cancelFuture,
-      ) async {
-    requests.add(options);
-    return handler(options);
-  }
-
-  @override
-  void close({bool force = false}) {}
-}
-
-ResponseBody jsonResponse(Object body, {int status = 200}) {
-  return ResponseBody.fromString(
-    jsonEncode(body),
-    status,
-    headers: {
-      Headers.contentTypeHeader: [Headers.jsonContentType],
-    },
-  );
-}
+import '../../support/fake_http.dart';
 
 const userJson = {
   'id': '6f1c2b0e-4d57-4a8e-9a53-0c1f2f3a4b5c',
