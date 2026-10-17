@@ -1,4 +1,6 @@
-﻿namespace CoopSol.Api.Extensions;
+﻿using CoopSol.Api.Endpoints;
+
+namespace CoopSol.Api.Extensions;
 
 public static class CorsServiceCollectionExtensions
 {
@@ -16,7 +18,8 @@ public static class CorsServiceCollectionExtensions
             options.AddPolicy(WebCorsPolicy, policy => policy
                 .WithOrigins(webOrigin)
                 .WithMethods("GET", "POST")
-                .WithHeaders("Authorization", "Content-Type")
+                .WithHeaders("Authorization", "Content-Type", RefreshCookie.ModeHeader)
+                .AllowCredentials()
             ));
         return services;
     }
