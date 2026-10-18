@@ -38,7 +38,7 @@ describe('authInterceptor', () => {
   })
 
   it('attaches the access token to request aimed at the api', () => {
-    tokenStore.setSession({accessToken: 'access-1', refreshToken: 'refresh-1', expiresInSeconds: 900, user})
+    tokenStore.setSession({accessToken: 'access-1', expiresInSeconds: 900, user})
 
     http.get(`${environment.apiUrl}/api/socios`).subscribe()
     const req = httpMock.expectOne(`${environment.apiUrl}/api/socios`)
@@ -47,7 +47,7 @@ describe('authInterceptor', () => {
   })
 
   it('does not attach a token to requests outside the api', () => {
-    tokenStore.setSession({ accessToken: 'access-1', refreshToken: 'refresh-1', expiresInSeconds: 900, user })
+    tokenStore.setSession({ accessToken: 'access-1', expiresInSeconds: 900, user })
 
     http.get('https://otrodominio.example/data').subscribe()
 
@@ -57,7 +57,7 @@ describe('authInterceptor', () => {
   })
 
   it('on a 401 it refreshes once and retries the original request', () => {
-    tokenStore.setSession({ accessToken: 'expired-access', refreshToken: 'refresh-1', expiresInSeconds: 900, user })
+    tokenStore.setSession({ accessToken: 'expired-access', expiresInSeconds: 900, user })
 
     let result: unknown
     http.get(`${environment.apiUrl}/api/socios`).subscribe((r) => (result = r))
@@ -66,8 +66,10 @@ describe('authInterceptor', () => {
       .flush({}, { status: 401, statusText: 'Unauthorized' })
 
     const refreshReq = httpMock.expectOne(`${environment.apiUrl}/api/auth/refresh`)
-    expect(refreshReq.request.body).toEqual({ refreshToken: 'refresh-1' })
-    refreshReq.flush({ accessToken: 'new-access', refreshToken: 'new-refresh', expiresInSeconds: 900, user })
+    expect(refreshReq.request.body).toBeNull()
+    expect(refreshReq.request.withCredentials).toBe(true)
+    expect(refreshReq.request.headers.get('X-Auth-Mode')).toBe('cookie')
+    refreshReq.flush({ accessToken: 'new-access', expiresInSeconds: 900, user })
 
     const retryReq = httpMock.expectOne(`${environment.apiUrl}/api/socios`)
     expect(retryReq.request.headers.get('Authorization')).toBe('Bearer new-access')
@@ -89,7 +91,7 @@ describe('authInterceptor', () => {
   })
 
   it('sends only one refresh when two requests fail with 401 at the same time', () => {
-    tokenStore.setSession({ accessToken: 'expired-access', refreshToken: 'refresh-1', expiresInSeconds: 900, user })
+    tokenStore.setSession({ accessToken: 'expired-access', expiresInSeconds: 900, user })
 
     http.get(`${environment.apiUrl}/api/socios`).subscribe()
     http.get(`${environment.apiUrl}/api/prestamos`).subscribe()
@@ -98,14 +100,14 @@ describe('authInterceptor', () => {
     httpMock.expectOne(`${environment.apiUrl}/api/prestamos`).flush({}, { status: 401, statusText: 'Unauthorized' })
 
     const refreshReq = httpMock.expectOne(`${environment.apiUrl}/api/auth/refresh`)
-    refreshReq.flush({ accessToken: 'new-access', refreshToken: 'new-refresh', expiresInSeconds: 900, user })
+    refreshReq.flush({ accessToken: 'new-access', expiresInSeconds: 900, user })
 
     httpMock.expectOne(`${environment.apiUrl}/api/socios`).flush({})
     httpMock.expectOne(`${environment.apiUrl}/api/prestamos`).flush({})
   })
 
   it('clears the session and propagates the error when the refresh itself fails', () => {
-    tokenStore.setSession({ accessToken: 'expired-access', refreshToken: 'stale-refresh', expiresInSeconds: 900, user })
+    tokenStore.setSession({ accessToken: 'expired-access', expiresInSeconds: 900, user })
 
     let error: unknown
     http.get(`${environment.apiUrl}/api/socios`).subscribe({ error: (e) => (error = e) })
@@ -115,6 +117,5 @@ describe('authInterceptor', () => {
 
     expect(error).toBeTruthy()
     expect(tokenStore.accessToken()).toBeNull()
-    expect(tokenStore.refreshToken()).toBeNull()
   })
 })

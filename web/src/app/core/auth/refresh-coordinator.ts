@@ -1,26 +1,21 @@
 import {inject, Injectable} from '@angular/core'
 import {AuthApiService} from './auth-api.service'
 import {TokenStore} from './token-store'
-import {AuthResponse} from './auth.model'
 import {catchError, finalize, Observable, shareReplay, tap, throwError} from 'rxjs'
+import {SessionResponse} from './auth.model';
 
 @Injectable({providedIn: 'root'})
 export class RefreshCoordinator {
   private readonly authApi = inject(AuthApiService)
   private readonly tokenStore = inject(TokenStore)
-  private inFlight: Observable<AuthResponse> | null = null
+  private inFlight: Observable<SessionResponse> | null = null
 
-  refresh(): Observable<AuthResponse> {
+  refresh(): Observable<SessionResponse> {
     if (this.inFlight) {
       return this.inFlight
     }
-    const refreshToken = this.tokenStore.refreshToken()
-    if (!refreshToken) {
-      this.tokenStore.clear()
-      return throwError(() => new Error('No hay refresh token disponible.'))
-    }
 
-    this.inFlight = this.authApi.refresh({refreshToken}).pipe(
+    this.inFlight = this.authApi.refresh().pipe(
       tap((response) => this.tokenStore.setSession(response)),
       catchError((err) => {
         this.tokenStore.clear()

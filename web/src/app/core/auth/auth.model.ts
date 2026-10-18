@@ -1,6 +1,6 @@
 ﻿export type UserRole = 'Socio' | 'Cajero' | 'OficialCredito' | 'Gerente' | 'Admin'
 
-export interface AuthUser{
+export interface AuthUser {
   id: string
   email: string
   fullName: string
@@ -13,18 +13,13 @@ export interface LoginRequest {
   password: string
 }
 
-export interface RefreshTokenRequest {
-  refreshToken: string
-}
-
-export interface AuthResponse {
+export interface SessionResponse {
   accessToken: string
-  refreshToken: string
   expiresInSeconds: number
   user: AuthUser
 }
 
-export interface CreateStaffUserRequest{
+export interface CreateStaffUserRequest {
   email: string
   password: string
   fullName: string
