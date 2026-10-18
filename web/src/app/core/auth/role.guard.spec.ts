@@ -1,13 +1,12 @@
-﻿import { AuthResponse, UserRole } from './auth.model'
+﻿import { SessionResponse, UserRole } from './auth.model'
 import { TokenStore } from './token-store'
 import { provideRouter, Router, UrlTree } from '@angular/router'
 import { TestBed } from '@angular/core/testing'
 import { roleGuard } from './role.guard'
 
-function buildAuthResponse(role: UserRole): AuthResponse{
+function buildAuthResponse(role: UserRole): SessionResponse{
   return {
     accessToken: 'fake-access-token',
-    refreshToken: 'fake-refresh-token',
     expiresInSeconds: 900,
     user: {
       id: 'u1',
