@@ -2,6 +2,7 @@ import 'package:coopsol_mobile/core/app_dependencies.dart';
 import 'package:coopsol_mobile/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
+import 'core/widgets/glass_background.dart';
 import 'features/session/session_gate.dart';
 
 class CoopSolApp extends StatelessWidget {
@@ -16,6 +17,7 @@ class CoopSolApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme:AppTheme.light(),
       darkTheme: AppTheme.dark(),
+      builder: (context, child) => GlassBackground(child: child!),
       home: SessionGate(
         sessionController: dependencies.sessionController,
         authService: dependencies.authService,

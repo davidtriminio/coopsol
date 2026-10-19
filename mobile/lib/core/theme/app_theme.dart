@@ -1,7 +1,6 @@
-﻿import 'package:coopsol_mobile/core/theme/auth_tokens.dart';
+﻿import 'package:coopsol_mobile/core/theme/glass_tokens.dart';
 import 'package:flutter/material.dart';
-
-import 'app_colors.dart';
+import 'package:flutter/services.dart';
 
 class AppTheme {
   AppTheme._();
@@ -33,74 +32,69 @@ class AppTheme {
     bodyLarge: TextStyle(
       fontFamily: bodyFont,
       fontSize: 16,
-      fontWeight: FontWeight.w400,
+      fontWeight: FontWeight.w500,
     ),
     bodyMedium: TextStyle(
       fontFamily: bodyFont,
       fontSize: 14,
-      fontWeight: FontWeight.w400,
+      fontWeight: FontWeight.w500,
     ),
     bodySmall: TextStyle(
       fontFamily: bodyFont,
       fontSize: 13,
-      fontWeight: FontWeight.w400,
+      fontWeight: FontWeight.w500,
     ),
     labelLarge: TextStyle(
       fontFamily: bodyFont,
       fontSize: 14,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w600,
     ),
     labelMedium: TextStyle(
       fontFamily: bodyFont,
       fontSize: 13,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w600,
     ),
   );
 
-  static ThemeData light() => _build(AppColors.light, AuthTokens.light);
+  static ThemeData light() => _build(GlassTokens.light, Brightness.light);
 
-  static ThemeData dark() => _build(AppColors.dark, AuthTokens.dark);
+  static ThemeData dark() => _build(GlassTokens.dark, Brightness.dark);
 
-  static ThemeData _build(ColorScheme scheme, AuthTokens auth) {
+  static ThemeData _build(GlassTokens glass, Brightness brightness) {
+    final scheme = glass.toColorScheme(brightness);
     final textTheme = _textTheme.apply(
-      bodyColor: scheme.onSurface,
-      displayColor: scheme.onSurface,
+      bodyColor: glass.text,
+      displayColor: glass.text,
     );
 
     final fieldBorder = OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: scheme.outlineVariant),
+      borderSide: BorderSide(color: glass.fieldBorder),
     );
 
     return ThemeData(
       useMaterial3: true,
       fontFamily: bodyFont,
       colorScheme: scheme,
-      scaffoldBackgroundColor: scheme.surface,
+      scaffoldBackgroundColor: Colors.transparent,
       textTheme: textTheme,
-      extensions: <ThemeExtension<dynamic>>[auth],
+      extensions: <ThemeExtension<dynamic>>[glass],
       appBarTheme: AppBarTheme(
-        backgroundColor: scheme.surfaceContainerLowest,
-        foregroundColor: scheme.onSurface,
+        backgroundColor: Colors.transparent,
+        foregroundColor: glass.text,
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        shape: Border(bottom: BorderSide(color: scheme.outlineVariant)),
         titleTextStyle: textTheme.titleMedium,
-      ),
-      cardTheme: CardThemeData(
-        color: scheme.surfaceContainerLowest,
-        elevation: 0,
-        margin: EdgeInsets.zero,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: scheme.outlineVariant),
-        ),
+        systemOverlayStyle:
+            (brightness == Brightness.light
+                    ? SystemUiOverlayStyle.dark
+                    : SystemUiOverlayStyle.light)
+                .copyWith(statusBarColor: Colors.transparent),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: scheme.surfaceContainerLowest,
+        fillColor: glass.fieldBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 12,
           vertical: 14,
@@ -109,26 +103,35 @@ class AppTheme {
         enabledBorder: fieldBorder,
         disabledBorder: fieldBorder,
         focusedBorder: fieldBorder.copyWith(
-          borderSide: BorderSide(color: scheme.primary, width: 1.5),
+          borderSide: BorderSide(color: glass.text, width: 1.5),
         ),
         errorBorder: fieldBorder.copyWith(
-          borderSide: BorderSide(color: scheme.error),
+          borderSide: BorderSide(color: glass.danger),
         ),
         focusedErrorBorder: fieldBorder.copyWith(
-          borderSide: BorderSide(color: scheme.error, width: 1.5),
+          borderSide: BorderSide(color: glass.danger, width: 1.5),
         ),
-        labelStyle: textTheme.bodyMedium?.copyWith(
-          color: scheme.onSurfaceVariant,
-        ),
-        errorStyle: textTheme.bodySmall?.copyWith(color: scheme.error),
+        labelStyle: textTheme.bodyMedium?.copyWith(color: glass.textMuted),
+        floatingLabelStyle: textTheme.bodySmall?.copyWith(color: glass.text),
+        errorStyle: textTheme.bodySmall?.copyWith(color: glass.danger),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
+          backgroundColor: glass.buttonBackground,
+          foregroundColor: glass.buttonForeground,
           shape: const StadiumBorder(),
           minimumSize: const Size(140, 44),
           textStyle: textTheme.labelLarge,
         ),
       ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: glass.text,
+          shape: const StadiumBorder(),
+          textStyle: textTheme.labelMedium,
+        ),
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(color: glass.text),
     );
   }
 }
