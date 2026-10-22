@@ -64,7 +64,7 @@ class GlassTokens extends ThemeExtension<GlassTokens> {
     fieldBorder: Color(0x47FFFFFF),
     buttonBackground: Color(0xFFB2A1FF),
     buttonForeground: Color(0xFF1C1436),
-    danger: Color(0xFFFF9B9B),
+    danger: Color(0xFFFFC8C8),
   );
 
   static GlassTokens of(BuildContext context){
