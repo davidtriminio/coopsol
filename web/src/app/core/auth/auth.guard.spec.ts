@@ -1,14 +1,13 @@
-﻿import { AuthResponse } from './auth.model'
+﻿import { SessionResponse } from './auth.model'
 import { TokenStore } from './token-store'
 import { provideRouter, Router, UrlTree } from '@angular/router'
 import { TestBed } from '@angular/core/testing'
 import { authGuard } from './auth.guard'
 
-function buildAuthResponse(): AuthResponse {
+function buildAuthResponse(): SessionResponse {
   return {
     expiresInSeconds: 900,
     accessToken: 'fake-access-token',
-    refreshToken: 'fake-refresh-token',
     user: {
       id: 'u1',
       email: 'admin@coopsol.local',

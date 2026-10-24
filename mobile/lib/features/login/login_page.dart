@@ -1,5 +1,8 @@
 import 'package:coopsol_mobile/core/auth/auth_exceptions.dart';
 import 'package:coopsol_mobile/core/auth/auth_service.dart';
+import 'package:coopsol_mobile/core/theme/glass_tokens.dart';
+import 'package:coopsol_mobile/core/widgets/brand_mark.dart';
+import 'package:coopsol_mobile/core/widgets/glass_card.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -101,6 +104,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final tokens = GlassTokens.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -108,77 +112,85 @@ class _LoginPageState extends State<LoginPage> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 400),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      'CoopSol',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: 32),
-                    Text('Bienvenido', style: theme.textTheme.titleLarge),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Inicia sesión con tu cuenta de socio',
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      key: const Key('login-email'),
-                      controller: _emailController,
-                      enabled: !_loading,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      autofillHints: const [AutofillHints.username],
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: const InputDecoration(
-                        labelText: 'Correo',
-                        border: OutlineInputBorder(),
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: GlassCard(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 32,
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: BrandMark(),
                       ),
-                      validator: _validateEmail,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      key: const Key('login-password'),
-                      controller: _passwordController,
-                      enabled: !_loading,
-                      obscureText: true,
-                      textInputAction: TextInputAction.done,
-                      autofillHints: const [AutofillHints.password],
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: const InputDecoration(
-                        labelText: 'Contraseña',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: _validatePassword,
-                      onFieldSubmitted: (_) => _submit(),
-                    ),
-                    if (_errorMessage != null) ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
+                      Text('Bienvenido', style: theme.textTheme.titleLarge),
+                      const SizedBox(height: 4),
                       Text(
-                        _errorMessage!,
-                        key: const Key('login-error'),
-                        style: TextStyle(color: theme.colorScheme.error),
+                        'Inicia sesión con tu cuenta de socio',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: tokens.textMuted,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        key: const Key('login-email'),
+                        controller: _emailController,
+                        enabled: !_loading,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        autofillHints: const [AutofillHints.username],
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: const InputDecoration(labelText: 'Correo'),
+                        validator: _validateEmail,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        key: const Key('login-password'),
+                        controller: _passwordController,
+                        enabled: !_loading,
+                        obscureText: true,
+                        textInputAction: TextInputAction.done,
+                        autofillHints: const [AutofillHints.password],
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: const InputDecoration(
+                          labelText: 'Contraseña',
+                        ),
+                        validator: _validatePassword,
+                        onFieldSubmitted: (_) => _submit(),
+                      ),
+                      if (_errorMessage != null) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          _errorMessage!,
+                          key: const Key('login-error'),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: tokens.danger,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 24),
+                      FilledButton(
+                        key: const Key('login-submit'),
+                        onPressed: _loading ? null : _submit,
+                        child: _loading
+                            ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: tokens.buttonForeground,
+                          ),
+                        )
+                            : const Text('Iniciar sesión'),
                       ),
                     ],
-                    const SizedBox(height: 24),
-                    FilledButton(
-                      key: const Key('login-submit'),
-                      onPressed: _loading ? null : _submit,
-                      child: _loading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text('Iniciar sesión'),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

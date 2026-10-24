@@ -1,13 +1,12 @@
-﻿import {AuthResponse} from './auth.model';
+﻿import {SessionResponse} from './auth.model';
 import {beforeEach, expect, it} from 'vitest';
 import {TokenStore} from './token-store';
 
 describe('TokenStore', () => {
   let store: TokenStore
 
-  const response: AuthResponse = {
+  const response: SessionResponse = {
     accessToken: 'access-123',
-    refreshToken: 'refresh-456',
     expiresInSeconds: 900,
     user: {
       id: 'a1b2c3d4-0000-0000-0000-000000000000',
@@ -25,16 +24,14 @@ describe('TokenStore', () => {
   it('starts with no session', () => {
     expect(store.isAuthenticated()).toBe(false)
     expect(store.accessToken()).toBeNull()
-    expect(store.refreshToken()).toBeNull()
     expect(store.currentUser()).toBeNull()
   })
 
-  it('setSession stores the tokens and the user', () => {
+  it('setSession stores the access token and the user', () => {
     store.setSession(response)
 
     expect(store.isAuthenticated()).toBe(true)
     expect(store.accessToken()).toBe('access-123')
-    expect(store.refreshToken()).toBe('refresh-456')
     expect(store.currentUser()).toEqual(response.user)
   })
 
@@ -45,7 +42,6 @@ describe('TokenStore', () => {
 
     expect(store.isAuthenticated()).toBe(false)
     expect(store.accessToken()).toBeNull()
-    expect(store.refreshToken()).toBeNull()
     expect(store.currentUser()).toBeNull()
   })
 

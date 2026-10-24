@@ -32,6 +32,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("Seed:AdminEmail", AdminEmail);
         builder.UseSetting("Seed:AdminPassword", AdminPassword);
         builder.UseSetting("RateLimiting:AuthPermitLimit", "1000");
+        builder.UseSetting("Cors:WebOrigin",  "http://localhost:4200");
     }
 
     public override async ValueTask DisposeAsync()

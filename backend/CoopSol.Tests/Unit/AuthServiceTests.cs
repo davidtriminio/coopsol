@@ -1,4 +1,5 @@
-﻿using CoopSol.Application.Auth;
+﻿using CoopSol.Application.Abstractions;
+using CoopSol.Application.Auth;
 using CoopSol.Domain.Enums;
 using CoopSol.Infrastructure.Security;
 using Microsoft.Extensions.Options;
@@ -64,6 +65,27 @@ public class AuthServiceTests
 
         Assert.False(second.IsSuccess);
         Assert.Equal(ErrorType.Conflict, second.Error!.Type);
+    }
+
+    [Fact]
+    public async Task Register_WhenSaveHitsUniqueViolation_ReturnsConflict()
+    {
+        _store.ThrowOnSave = new UniqueConstraintViolationException(new Exception("23505"));
+
+        var result = await _sut.RegisterAsync(
+            new RegisterRequest("carrera@test.com", "Password-123", "Socio Carrera"), TestContext.Current.CancellationToken);
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(AuthErrors.EmailTaken, result.Error);
+    }
+
+    [Fact]
+    public async Task Register_WhenSaveFailsForAnotherReason_PropagatesTheException()
+    {
+        _store.ThrowOnSave = new InvalidOperationException("fallo de BD");
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.RegisterAsync(
+            new RegisterRequest("otro@test.com", "Password-123", "Socio Otro"), TestContext.Current.CancellationToken));
     }
 
     [Fact]

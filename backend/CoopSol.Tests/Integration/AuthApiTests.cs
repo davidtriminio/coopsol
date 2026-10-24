@@ -53,6 +53,18 @@ public class AuthApiTests(ApiFactory factory)
     }
 
     [Fact]
+    public async Task Register_ConcurrentSameEmail_YieldsOneCreatedAndTheRestConflict()
+    {
+        var email = NewEmail();
+
+        var responses = await Task.WhenAll(Enumerable.Range(0, 8).Select(_ =>
+            _client.PostAsJsonAsync("/api/auth/register", new RegisterRequest(email, Password, "Socio de Prueba"), Ct)));
+
+        Assert.Equal(1, responses.Count(r => r.StatusCode == HttpStatusCode.Created));
+        Assert.Equal(7, responses.Count(r => r.StatusCode == HttpStatusCode.Conflict));
+    }
+
+    [Fact]
     public async Task Register_IgnoresRoleField_SoNobodyCanSelfPromote()
     {
         var email = NewEmail();

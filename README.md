@@ -4,12 +4,14 @@ Plataforma de gestión interna para una cooperativa de ahorro y crédito hondure
 No es banca real, no mueve dinero real, no da asesoría financiera. Proyecto de aprendizaje intensivo.
 
 ## Stack
+
 - Backend: .NET 10 (SDK 10.0.401), ASP.NET Core minimal APIs, EF Core 10, PostgreSQL 17.
 - Web (staff): Angular 22 (standalone, signals, zoneless), TypeScript 6, pnpm, tests con Vitest.
 - Mobile (socio): Flutter 3.47 / Dart 3.13, `dio`, `flutter_secure_storage`.
 - Infra: Docker Compose.
 
 ## Arquitectura
+
 Clean Architecture "lite" por capas: `Domain` → `Application` → `Infrastructure` → `Api`.
 Los clientes (`web/` y `mobile/`) consumen la API REST y no guardan secretos.
 
@@ -29,22 +31,24 @@ Los clientes (`web/` y `mobile/`) consumen la API REST y no guardan secretos.
 
 3. Configura los secretos en User Secrets (una sola vez):
    ```pwsh
-   dotnet user-secrets init --project backend/CoopSol.Api
-   dotnet user-secrets set "ConnectionStrings:Default" "Host=localhost;Port=5432;Database=coopsol_dev;Username=coopsol;Password=<tu-password>" --project backend/CoopSol.Api
-   $secret = [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(64))
-   dotnet user-secrets set "Jwt:Secret" $secret --project backend/CoopSol.Api
-   dotnet user-secrets set "Seed:AdminEmail" "admin@coopsol.local" --project backend/CoopSol.Api
-   dotnet user-secrets set "Seed:AdminPassword" "<elige-una-clave-de-12+-caracteres>" --project backend/CoopSol.Api
+   cd backend
+   dotnet user-secrets init --project CoopSol.Api
+   dotnet user-secrets set "ConnectionStrings:Default" "Host=localhost;Port=5432;Database=coopsol_dev;Username=coopsol;Password=<tu-password>" --project CoopSol.Api
+   $secret = [Convert]::ToBase64String ([System.Security.Cryptography.RandomNumberGenerator]::GetBytes (64))
+   dotnet user-secrets set "Jwt:Secret" $secret --project CoopSol.Api
+   dotnet user-secrets set "Seed:AdminEmail" "admin@coopsol.local" --project CoopSol.Api
+   dotnet user-secrets set "Seed:AdminPassword" "<elige-una-clave-de-12+-caracteres>" --project CoopSol.Api
    ```
 
 4. Corre la API (escucha en `http://localhost:5143`):
    ```pwsh
-   dotnet run --project backend/CoopSol.Api
+   cd backend
+   dotnet run --project CoopSol.Api
    ```
 
 5. Verifica:
-   - `GET /health/live` → proceso vivo.
-   - `GET /health/ready` → proceso vivo y BD alcanzable.
+    - `GET /health/live` → proceso vivo.
+    - `GET /health/ready` → proceso vivo y BD alcanzable.
 
 ### 2. Web (staff)
 
@@ -75,6 +79,14 @@ En Android, el emulador llega a la API en `http://10.0.2.2:5143`. Para otra URL:
 flutter run --dart-define=API_URL=http://192.168.1.10:5143
 ```
 
+Para compilar un release, `API_URL` es obligatoria y debe ser una URL `https`; sin ella, la app lanza un error al arrancar:
+
+```pwsh
+flutter build apk --release --dart-define=API_URL=https://api.ejemplo.hn
+```
+
+La app sigue la línea gráfica de vidrio (ver [ADR 0002](docs/adr/0002-sistema-de-diseno-de-vidrio-compartido.md)) y respeta el modo claro u oscuro del dispositivo.
+
 La app solo admite el rol Socio. Crea uno con el registro público de la API:
 
 ```pwsh
@@ -83,22 +95,35 @@ Invoke-RestMethod -Method Post -Uri http://localhost:5143/api/auth/register -Con
 ```
 
 ## Endpoints de autenticación
-| Método | Ruta | Acceso |
-|---|---|---|
-| POST | /api/auth/register | Público (crea Socio) |
-| POST | /api/auth/login | Público |
-| POST | /api/auth/refresh | Público (rota el refresh token) |
-| POST | /api/auth/logout | Público (revoca el refresh token) |
-| GET | /api/auth/me | JWT |
-| POST | /api/admin/users | JWT + rol Admin |
+
+| Método | Ruta               | Acceso                            |
+|--------|--------------------|-----------------------------------|
+| POST   | /api/auth/register | Público (crea Socio)              |
+| POST   | /api/auth/login    | Público                           |
+| POST   | /api/auth/refresh  | Público (rota el refresh token)   |
+| POST   | /api/auth/logout   | Público (revoca el refresh token) |
+| GET    | /api/auth/me       | JWT                               |
+| POST   | /api/admin/users   | JWT + rol Admin                   |
 
 Los endpoints públicos de auth tienen un límite de 10 peticiones por minuto.
 
+### Refresh token: cuerpo o cookie
+
+- **Sin header** (mobile): login y refresh devuelven `refreshToken` en el cuerpo, y refresh y logout lo reciben en el cuerpo.
+- **Con `X-Auth-Mode: cookie`** (web): el refresh token viaja en la cookie `coopsol_refresh` (`HttpOnly`, `Secure`, `SameSite=Strict`, ruta `/api/auth`) y no aparece en el cuerpo. La web restaura la sesión al recargar llamando a `/api/auth/refresh`.
+
+Detalle y alternativas en el [ADR 0001](docs/adr/0001-refresh-token-en-cookie-httponly-para-web.md). En desarrollo el límite público sube a 100 por minuto, porque cada recarga de la web hace un refresh.
+
 ## Tests
+
+
+Backend (los de integración usan Testcontainers y requieren Docker Desktop encendido):
+Cada bloque parte de la raíz del repo. Los comandos de .NET se ejecutan desde `backend/`, porque ahí viven `global.json` (SDK y runner de tests) y `Directory.Build.props`.
 
 Backend (los de integración usan Testcontainers y requieren Docker Desktop encendido):
 
 ```pwsh
+cd backend
 dotnet test CoopSol.slnx
 ```
 
@@ -117,5 +142,7 @@ flutter test
 flutter analyze
 ```
 
-## Documentación por fase
-Ver [`docs/fases/`](docs/fases/) para el reporte de cada fase (qué se construyó, decisiones, validación).
+## Documentación
+
+- Reportes por fase: [`docs/fases/`](docs/fases/) (qué se construyó, decisiones, validación y deuda).
+- Decisiones de arquitectura: [`docs/adr/`](docs/adr/).
