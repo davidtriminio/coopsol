@@ -1,4 +1,4 @@
-*{
+* {
   box-sizing: border-box;
 }
 
@@ -19,10 +19,25 @@ body {
   --accent: #3c6e58;
   --accent-fg: #eef6f1;
   --danger: #a32d2d;
+  color-scheme: light dark;
+  --glass-glow-top: #a99bf0;
+  --glass-glow-bottom: #e6a3d8;
+  --glass-base-start: #ece7ff;
+  --glass-base-end: #f6e8f8;
+  --glass-card-bg: rgba(255, 255, 255, 0.55);
+  --glass-card-border: rgba(255, 255, 255, 0.7);
+  --glass-card-shadow: rgba(61, 50, 160, 0.18);
+  --glass-text: #1c1436;
+  --glass-text-muted: #4a3f7a;
+  --glass-field-bg: rgba(255, 255, 255, 0.6);
+  --glass-field-border: rgba(28, 20, 54, 0.22);
+  --glass-btn-bg: #3d32a0;
+  --glass-btn-fg: #f2efff;
+  --glass-error: #b3261e;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root{
+  :root {
     --surface: #15140f;
     --surface-elevated: #201f1c;
     --text: #f1efe7;
@@ -31,13 +46,42 @@ body {
     --accent: #7fb69c;
     --accent-fg: #0e1a15;
     --danger: #ff9b9b;
+    --glass-glow-top: #4b3fae;
+    --glass-glow-bottom: #7a2f6b;
+    --glass-base-start: #1a1330;
+    --glass-base-end: #100b1e;
+    --glass-card-bg: rgba(255, 255, 255, 0.07);
+    --glass-card-border: rgba(255, 255, 255, 0.2);
+    --glass-card-shadow: rgba(0, 0, 0, 0.35);
+    --glass-text: #f5f2ff;
+    --glass-text-muted: #d9d2fa;
+    --glass-field-bg: rgba(255, 255, 255, 0.06);
+    --glass-field-border: rgba(255, 255, 255, 0.28);
+    --glass-btn-bg: #b2a1ff;
+    --glass-btn-fg: #1c1436;
+    --glass-error: #ffc8c8;
   }
 }
 
 body {
   font-family: var(--font-body);
-  background: var(--surface);
-  color: var(--text);
+  font-weight: 500;
+  background-color: var(--glass-base-end);
+  background-image: radial-gradient(120% 90% at 15% 10%, var(--glass-glow-top) 0%, transparent 55%),
+  radial-gradient(120% 100% at 90% 85%, var(--glass-glow-bottom) 0%, transparent 60%),
+  linear-gradient(160deg, var(--glass-base-start) 0%, var(--glass-base-end) 100%);
+  background-attachment: fixed;
+  color: var(--glass-text);
+}
+
+.glass-card {
+  border-radius: 24px;
+  background: var(--glass-card-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-card-border);
+  box-shadow: 0 8px 32px var(--glass-card-shadow);
+  color: var(--glass-text);
 }
 
 @font-face {
