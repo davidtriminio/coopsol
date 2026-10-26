@@ -77,8 +77,8 @@ button:not(.logout) {
 
 button.logout {
   background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
+  border: 1px solid var(--glass-field-border);
+  color: var(--glass-text);
 }
 
 button.logout:hover {
