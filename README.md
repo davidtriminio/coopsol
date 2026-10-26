@@ -63,6 +63,8 @@ pnpm start
 Abre `http://localhost:4200`. Entra con el Admin sembrado en el paso 3.
 Desde `/admin/users/new` un Admin crea usuarios de staff.
 
+La web sigue la misma línea gráfica de vidrio que mobile (ver [ADR 0002](docs/adr/0002-sistema-de-diseno-de-vidrio-compartido.md)): los tokens viven como variables `--glass-*` en `web/src/styles.css`, con modo claro y oscuro según el sistema, y la tarjeta es la clase global `.glass-card`.
+
 ### 3. Mobile (socio)
 
 Requiere la API corriendo y un emulador Android o un dispositivo conectado.
